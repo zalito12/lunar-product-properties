@@ -1,38 +1,35 @@
 <?php
 
-namespace Gongarce\ProductFaq\Filament\Resources;
+namespace Gongarce\ProductProps\Filament\Resources;
 
-use Filament\Forms;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Gongarce\ProductFaq\Filament\Resources\QuestionResource\RelationManagers\ProductsRelationManager;
-use Gongarce\ProductFaq\Filament\Resources\QuestionResource\RelationManagers\VariantsRelationManager;
 use Lunar\Admin\Support\Forms\Components\TranslatedText;
 use Lunar\Admin\Support\Resources\BaseResource;
-use Gongarce\ProductFaq\Filament\Resources\QuestionResource\Pages;
-use Gongarce\ProductFaq\Models\Contracts\Question;
+use Gongarce\ProductProps\Filament\Resources\PropertyResource\Pages;
+use Gongarce\ProductProps\Filament\Resources\PropertyResource\RelationManagers\PropertyValuesRelationManager;
+use Gongarce\ProductProps\Models\Property;
 use Lunar\Admin\Support\Tables\Columns\TranslatedTextColumn;
 
-class QuestionResource extends BaseResource
+class PropertyResource extends BaseResource
 {
-    protected static ?string $permission = 'catalog:manage-products';
-
-    protected static ?string $model = Question::class;
+    protected static ?string $model = Property::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-swatch';  // TODO: remove me in Filament 3.1
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function getLabel(): string
     {
-        return __('lunarpanel.product-faq::question.label');
+        return __('lunarpanel.product-props::property.label');
     }
 
     public static function getPluralLabel(): string
     {
-        return __('lunarpanel.product-faq::question.label_plural');
+        return __('lunarpanel.product-props::property.label_plural');
     }
 
     public static function getNavigationParentItem(): ?string
@@ -48,37 +45,34 @@ class QuestionResource extends BaseResource
     public static function getDefaultForm(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Section::make()
-                    ->schema(
-                        static::getMainFormComponents(),
-                    )
-            ])
+            ->schema(
+                static::getMainFormComponents(),
+            )
             ->columns(1);
     }
 
     protected static function getMainFormComponents(): array
     {
         return [
-            static::getNameFormComponent(),
-            static::getAnswerFormComponent(),
+            static::getHandleFormComponent(),
+            static::getLabelFormComponent(),
         ];
     }
 
-    public static function getNameFormComponent(): Component
+    public static function getHandleFormComponent(): Component
     {
         return
-            TranslatedText::make('text')
-            ->label(__('lunarpanel.product-faq::question.form.text.label'))
+            TextInput::make('handle')
+            ->label(__('lunarpanel.product-props::property.form.text.handle'))
             ->required()
             ->autofocus();
     }
 
-    public static function getAnswerFormComponent(): Component
+    public static function getLabelFormComponent(): Component
     {
-        return TranslatedText::make('answer')
-            ->label(__('lunarpanel.product-faq::question.form.answer.label'))
-            ->optionRichtext(true)
+        return
+            TranslatedText::make('label')
+            ->label(__('lunarpanel.product-props::property.form.text.label'))
             ->required();
     }
 
@@ -103,9 +97,9 @@ class QuestionResource extends BaseResource
     public static function getTableColumns(): array
     {
         return [
-            TranslatedTextColumn::make('text')
+            TranslatedTextColumn::make('label')
                 ->label(
-                    __('lunarpanel.product-faq::question.table.text.label')
+                    __('lunarpanel.product-props::property.table.text.label')
                 )
                 ->searchable(),
         ];
@@ -114,16 +108,15 @@ class QuestionResource extends BaseResource
     public static function getRelations(): array
     {
         return [
-            ProductsRelationManager::class,
-            VariantsRelationManager::class,
+            PropertyValuesRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListQuestion::route('/'),
-            'edit' => Pages\EditQuestion::route('/{record}/edit'),
+            'index' => Pages\ListProperty::route('/'),
+            'edit' => Pages\EditProperty::route('/{record}/edit'),
         ];
     }
 }

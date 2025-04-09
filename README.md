@@ -1,4 +1,4 @@
-# Lunar Product FAQ
+# Lunar Product Properties
 
 Allows to create translatable questions (with answers) and associate them to products.
 
@@ -15,20 +15,20 @@ TODO:
 Install via Composer
 
 ```
-composer require gongarce/lunar-product-faq
+composer require gongarce/lunar-product-props
 ```
 
 Then register the plugin in your service provider
 
 ```php
 use Lunar\Admin\Support\Facades\LunarPanel;
-use Gongarce\ProductFaq\ProductFaqPlugin;
+use Gongarce\ProductProps\ProductPropsPlugin;
 // ...
 
 public function register(): void
 {
     LunarPanel::panel(function (Panel $panel) {
-        return $panel->plugin(new ProductFaqPlugin());
+        return $panel->plugin(new ProductPropsPlugin());
     })->register();
     
     // ...

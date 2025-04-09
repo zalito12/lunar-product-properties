@@ -1,6 +1,6 @@
 {
-  "name": "gongarce/lunar-product-faq",
-  "description": "Lunar Product Product FAQ Addon",
+  "name": "gongarce/lunar-product-properties",
+  "description": "Lunar Product Properties Addon",
   "keywords": [
     "lunar",
     "laravel",
@@ -21,16 +21,16 @@
   ],
   "autoload": {
     "psr-4": {
-      "Gongarce\\ProductFaq\\": "src"
+      "Gongarce\\ProductProps\\": "src"
     }
   },
   "extra": {
     "lunar": {
-      "name": "Lunar Product Faq"
+      "name": "Lunar Product Properties"
     },
     "laravel": {
       "providers": [
-        "Gongarce\\ProductFaq\\ProductFaqServiceProvider"
+        "Gongarce\\ProductProps\\ProductPropsServiceProvider"
       ]
     }
   },

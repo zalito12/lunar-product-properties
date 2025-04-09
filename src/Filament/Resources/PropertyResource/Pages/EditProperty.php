@@ -1,14 +1,14 @@
 <?php
 
-namespace Gongarce\ProductFaq\Filament\Resources\QuestionResource\Pages;
+namespace Gongarce\ProductProps\Filament\Resources\PropertyResource\Pages;
 
 use Filament\Actions;
+use Gongarce\ProductProps\Filament\Resources\PropertyResource;
 use Lunar\Admin\Support\Pages\BaseEditRecord;
-use Gongarce\ProductFaq\Filament\Resources\QuestionResource;
 
-class EditQuestion extends BaseEditRecord
+class EditProperty extends BaseEditRecord
 {
-    protected static string $resource = QuestionResource::class;
+    protected static string $resource = PropertyResource::class;
 
     protected function getDefaultHeaderActions(): array
     {

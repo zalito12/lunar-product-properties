@@ -2,15 +2,15 @@
 
 namespace factories;
 
-use Gongarce\ProductFaq\Models\Question;
+use Gongarce\ProductProps\Models\Property;
 use Lunar\Database\Factories\BaseFactory;
 
 /**
- * @extends \Lunar\Database\Factories\BaseFactory<\App\Models\Question>
+ * @extends \Lunar\Database\Factories\BaseFactory<\App\Models\Property>
  */
-class QuestionFactory extends BaseFactory
+class PropertyFactory extends BaseFactory
 {
-    protected $model = Question::class;
+    protected $model = Property::class;
 
     /**
      * Define the model's default state.
@@ -20,11 +20,8 @@ class QuestionFactory extends BaseFactory
     public function definition(): array
     {
         return [
-            'text' => collect([
+            'label' => collect([
                 'en' => $this->faker->name(),
-            ]),
-            'answer' => collect([
-                'en' => $this->faker->realText(),
             ]),
         ];
     }

@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create($this->prefix.'questions', function (Blueprint $table) {
+        Schema::create($this->prefix . 'product_prop_values', function (Blueprint $table) {
             $table->id();
-            $table->json('text');
-            $table->json('answer');
-            $table->integer('position')->index();
+            $table->json('label');
+            $table->foreignId('property_id')->constrained($this->prefix . 'product_props');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists($this->prefix.'questions');
+        Schema::dropIfExists($this->prefix . 'product_prop_values');
     }
 };

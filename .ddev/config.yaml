@@ -1,4 +1,4 @@
-name: lunar-faq
+name: lunar-props
 type: laravel
 docroot: .
 php_version: "8.3"
