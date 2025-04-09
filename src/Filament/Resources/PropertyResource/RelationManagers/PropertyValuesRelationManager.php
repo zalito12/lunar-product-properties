@@ -1,6 +1,6 @@
 <?php
 
-namespace Gongarce\ProductFaq\Filament\Resources\QuestionResource\RelationManagers;
+namespace Gongarce\ProductProps\Filament\Resources\QuestionResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -13,13 +13,13 @@ use Lunar\Admin\Support\Tables\Columns\TranslatedTextColumn;
 use Lunar\Models\Product;
 use Lunar\Models\ProductVariant;
 
-class ProductsRelationManager extends RelationManager
+class PropertyValuesRelationManager extends RelationManager
 {
     protected static string $relationship = 'products';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('lunarpanel.product-faq::question.relations.products.title_plural');
+        return __('lunarpanel.product-props::question.relations.products.title_plural');
     }
 
     public function table(Table $table): Table
@@ -43,19 +43,19 @@ class ProductsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\AttachAction::make()
                     ->label(
-                        __('lunarpanel.product-faq::question.relations.products.actions.attach.label')
+                        __('lunarpanel.product-props::question.relations.products.actions.attach.label')
                     )
                     ->form([
                         Forms\Components\Select::make('recordId')
                             ->label(
-                                __('lunarpanel.product-faq::question.relations.products.actions.attach.field')
+                                __('lunarpanel.product-props::question.relations.products.actions.attach.field')
                             )
                             ->required()
                             ->searchable()
                             ->getSearchResultsUsing(static function (Forms\Components\Select $component, string $search): array {
                                 return Product::search($search)
                                     ->get()
-                                    ->mapWithKeys(fn (Product $record): array => [$record->getKey() => $record->translateAttribute('name')])
+                                    ->mapWithKeys(fn(Product $record): array => [$record->getKey() => $record->translateAttribute('name')])
                                     ->all();
                             }),
                     ])

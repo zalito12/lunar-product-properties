@@ -1,25 +1,23 @@
 <?php
 
-namespace Gongarce\ProductFaq\Models;
+namespace Gongarce\ProductProps\Models;
 
-use factories\QuestionFactory;
+use factories\PropertyFactory;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Lunar\Base\BaseModel;
 use Lunar\Base\Traits\HasTranslations;
 use Lunar\Base\Traits\Searchable;
 use Lunar\Models\Product;
-use Lunar\Models\ProductVariant;
 
 /**
  * @property int $id
- * @property string $text translatable text
- * @property string $answer translatable rich text
+ * @property string $label translatable label
  * @property ?\Illuminate\Support\Carbon $created_at
  * @property ?\Illuminate\Support\Carbon $updated_at
  */
-class Question extends BaseModel implements Contracts\Question
+class Property extends BaseModel implements Contracts\Property
 {
     use HasFactory;
     use HasTranslations;
@@ -37,9 +35,7 @@ class Question extends BaseModel implements Contracts\Question
      * {@inheritDoc}
      */
     protected $casts = [
-        //'attribute_data' => AsAttributeData::class,
-        'text' => AsCollection::class,
-        'answer' => AsCollection::class,
+        'label' => AsCollection::class,
     ];
 
     protected static function booted()
@@ -57,24 +53,15 @@ class Question extends BaseModel implements Contracts\Question
      */
     protected static function newFactory()
     {
-        return QuestionFactory::new();
+        return PropertyFactory::new();
     }
 
     /**
-     * Return the purchasable relationship.
+     * Return the products relationship.
      */
-    public function products(): MorphToMany
+    public function products(): BelongsToMany
     {
         $prefix = config('lunar.database.table_prefix');
-        return $this->morphedByMany(Product::class, 'questionable', "{$prefix}questionable");
-    }
-
-    /**
-     * Return the purchasable relationship.
-     */
-    public function variants(): MorphToMany
-    {
-        $prefix = config('lunar.database.table_prefix');
-        return $this->morphedByMany(ProductVariant::class, 'questionable', "{$prefix}questionable");
+        return $this->belongsToMany(Product::class, "{$prefix}product_property");
     }
 }

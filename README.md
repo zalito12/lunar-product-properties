@@ -22,13 +22,13 @@ Then register the plugin in your service provider
 
 ```php
 use Lunar\Admin\Support\Facades\LunarPanel;
-use Gongarce\ProductFaq\ProductFaqPlugin;
+use Gongarce\ProductProps\ProductPropsPlugin;
 // ...
 
 public function register(): void
 {
     LunarPanel::panel(function (Panel $panel) {
-        return $panel->plugin(new ProductFaqPlugin());
+        return $panel->plugin(new ProductPropsPlugin());
     })->register();
     
     // ...
