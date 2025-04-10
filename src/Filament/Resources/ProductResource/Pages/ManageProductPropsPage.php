@@ -41,9 +41,10 @@ class ManageProductPropsPage extends BaseManageRelatedRecords
             ->schema([
                 Select::make('property_id')
                     ->relationship(name: 'property', titleAttribute: 'handle')
-                    ->label(__('lunarpanel.product-props::property.form.text.label')),
+                    ->label(__('lunarpanel.product-props::property.form.property.label'))
+                    ->searchable(),
                 TranslatedText::make('label')
-                    ->label(__('lunarpanel.product-props::property-value.form.text.label'))
+                    ->label(__('lunarpanel.product-props::property.form.label.label'))
                     ->required()
                     ->autofocus(),
             ]);
@@ -54,11 +55,11 @@ class ManageProductPropsPage extends BaseManageRelatedRecords
         return $table->columns([
             TextColumn::make('property.handle')
                 ->label(
-                    __('lunarpanel.product-props::property.table.text.handle')
+                    __('lunarpanel.product-props::property.form.property.label')
                 ),
             TranslatedTextColumn::make('label')
                 ->label(
-                    __('lunarpanel.product-props::property-value.table.text.label')
+                    __('lunarpanel.product-props::property.form.label.label')
                 )
                 ->searchable(),
         ])

@@ -11,22 +11,22 @@ class ProductPropsServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/product-properties.php', 'lunar.product-properties');
+        $this->mergeConfigFrom(__DIR__ . '/../config/product-props.php', 'lunar.product-props');
     }
 
     public function boot()
     {
-        if (! config('lunar.product-properties.enabled')) {
+        if (! config('lunar.product-props.enabled')) {
             return;
         }
 
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'lunarpanel.product-properties');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'lunarpanel.product-props');
 
         if (! config('lunar.database.disable_migrations', false)) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'product-properties');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'product-props');
 
         Product::resolveRelationUsing('properties', function (Product $product) {
             $prefix = config('lunar.database.table_prefix');

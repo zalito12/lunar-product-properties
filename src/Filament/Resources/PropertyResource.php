@@ -63,7 +63,7 @@ class PropertyResource extends BaseResource
     {
         return
             TextInput::make('handle')
-            ->label(__('lunarpanel.product-props::property.form.text.handle'))
+            ->label(__('lunarpanel.product-props::property.form.handle.label'))
             ->required()
             ->autofocus();
     }
@@ -72,7 +72,7 @@ class PropertyResource extends BaseResource
     {
         return
             TranslatedText::make('label')
-            ->label(__('lunarpanel.product-props::property.form.text.label'))
+            ->label(__('lunarpanel.product-props::property.form.label.label'))
             ->required();
     }
 
@@ -99,7 +99,7 @@ class PropertyResource extends BaseResource
         return [
             TranslatedTextColumn::make('label')
                 ->label(
-                    __('lunarpanel.product-props::property.table.text.label')
+                    __('lunarpanel.product-props::property.form.label.label')
                 )
                 ->searchable(),
         ];

@@ -31,7 +31,7 @@ class ProductPropsPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        if (! config('lunar.product-properties.enabled')) {
+        if (! config('lunar.product-props.enabled')) {
             return;
         }
 

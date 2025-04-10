@@ -20,7 +20,7 @@ class PropertyValuesRelationManager extends RelationManager
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
-        return __('lunarpanel.product-props::question.relations.products.title_plural');
+        return __('lunarpanel.product-props::property.relations.values.title_plural');
     }
 
     public function table(Table $table): Table
@@ -29,18 +29,18 @@ class PropertyValuesRelationManager extends RelationManager
             ->columns([
                 TranslatedTextColumn::make('label')
                     ->label(
-                        __('lunarpanel.product-props::property.table.text.label')
+                        __('lunarpanel.product-props::property.form.label.label')
                     )
                     ->searchable(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->label(
-                        __('lunarpanel.product-props::question.relations.products.actions.attach.label')
+                        __('lunarpanel.product-props::property.relations.values.actions.create.label')
                     )
                     ->form([
                         TranslatedText::make('label')
-                            ->label(__('lunarpanel.product-props::property.form.text.label'))
+                            ->label(__('lunarpanel.product-props::property.form.label.label'))
                             ->required(),
                     ])
             ])

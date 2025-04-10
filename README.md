@@ -15,7 +15,7 @@ TODO:
 Install via Composer
 
 ```
-composer require gongarce/lunar-product-props
+composer require gongarce/lunar-product-properties
 ```
 
 Then register the plugin in your service provider
