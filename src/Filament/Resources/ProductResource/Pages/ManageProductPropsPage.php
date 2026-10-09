@@ -8,7 +8,7 @@ use Filament\Support\Facades\FilamentIcon;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Gongarce\ProductProps\Models\PropertyValue;
+use Gongarce\ProductProps\Models\Contracts\PropertyValue;
 use Lunar\Admin\Filament\Resources\ProductResource;
 use Lunar\Admin\Support\Forms\Components\TranslatedText;
 use Lunar\Admin\Support\Pages\BaseManageRelatedRecords;

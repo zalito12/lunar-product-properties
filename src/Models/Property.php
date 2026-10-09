@@ -3,6 +3,9 @@
 namespace Gongarce\ProductProps\Models;
 
 use factories\PropertyFactory;
+use Gongarce\ProductProps\Events\ProductPropertiesChanged;
+use Gongarce\ProductProps\Events\ProductPropertiesChangeReason;
+use Gongarce\ProductProps\Exceptions\PropertyHasValuesException;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -49,12 +52,55 @@ class Property extends BaseModel
 
     protected static function booted()
     {
-        /*static::deleting(function (self $shippingMethod) {
-            DB::beginTransaction();
-            $shippingMethod->customerGroups()->detach();
-            $shippingMethod->shippingRates()->delete();
-            DB::commit();
-        });*/
+        static::updated(function (self $property) {
+            if (! $property->wasChanged(['label', 'handle'])) {
+                return;
+            }
+
+            ProductPropertiesChanged::dispatch(
+                $property->affectedProductIds(),
+                ProductPropertiesChangeReason::PropertyUpdated,
+                $property->getKey(),
+            );
+        });
+
+        // Properties can only be deleted once they have no values, so no
+        // product can lose a rendered property without a ValueDeleted event.
+        static::deleting(function (self $property) {
+            if ($property->hasValues()) {
+                throw PropertyHasValuesException::for($property);
+            }
+        });
+
+        static::deleted(function (self $property) {
+            ProductPropertiesChanged::dispatch(
+                [],
+                ProductPropertiesChangeReason::PropertyDeleted,
+                $property->getKey(),
+            );
+        });
+    }
+
+    public function hasValues(): bool
+    {
+        return $this->values()->exists();
+    }
+
+    /**
+     * Return the ids of every product associated to any of this property's values.
+     *
+     * @return list<int>
+     */
+    public function affectedProductIds(): array
+    {
+        if (! $this->getKey()) {
+            return [];
+        }
+
+        return ProductPropertyValue::productIdsForValues(
+            $this->values()->pluck($this->values()->getRelated()->getQualifiedKeyName()),
+            $this->getConnectionName(),
+        );
     }
 
     /**
@@ -70,6 +116,6 @@ class Property extends BaseModel
      */
     public function values(): HasMany
     {
-        return $this->hasMany(PropertyValue::class);
+        return $this->hasMany(PropertyValue::modelClass(), 'property_id');
     }
 }

@@ -13,7 +13,7 @@ class EditProperty extends BaseEditRecord
     protected function getDefaultHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            PropertyResource::preventDeletingWithValues(Actions\DeleteAction::make()),
         ];
     }
 

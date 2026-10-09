@@ -24,4 +24,10 @@ return [
             ],
         ],
     ],
+    'notifications' => [
+        'has_values' => [
+            'title' => 'Property in use',
+            'body' => 'Delete its values before deleting the property.',
+        ],
+    ],
 ];

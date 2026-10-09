@@ -1,45 +1,62 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Test Case
-|--------------------------------------------------------------------------
-|
-| The closure you provide to your test functions is always bound to a specific PHPUnit test
-| case class. By default, that class is "PHPUnit\Framework\TestCase". Of course, you may
-| need to change it using the "uses()" function to bind a different classes or traits.
-|
-*/
+use Gongarce\ProductProps\Events\ProductPropertiesChanged;
+use Gongarce\ProductProps\Events\ProductPropertiesChangeReason;
+use Gongarce\ProductProps\Models\Property;
+use Gongarce\ProductProps\Models\PropertyValue;
+use Gongarce\ProductProps\Tests\PrefixedTestCase;
+use Gongarce\ProductProps\Tests\TestCase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 
-// uses(Tests\TestCase::class)->in('Feature');
+uses(TestCase::class)->in('Feature');
+uses(PrefixedTestCase::class)->in('Prefixed');
 
-/*
-|--------------------------------------------------------------------------
-| Expectations
-|--------------------------------------------------------------------------
-|
-| When you're writing tests, you often need to check that values meet certain conditions. The
-| "expect()" function gives you access to a set of "expectations" methods that you can use
-| to assert different things. Of course, you may extend the Expectation API at any time.
-|
-*/
-
-expect()->extend('toBeOne', function () {
-    return $this->toBe(1);
-});
-
-/*
-|--------------------------------------------------------------------------
-| Functions
-|--------------------------------------------------------------------------
-|
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
-|
-*/
-
-function something()
+function createProperty(array $attributes = []): Property
 {
-    // ..
+    return Property::create([
+        'handle' => 'prop-'.Str::random(8),
+        'label' => ['en' => 'Material'],
+        ...$attributes,
+    ]);
+}
+
+function createValue(?Property $property = null, array $attributes = []): PropertyValue
+{
+    return PropertyValue::create([
+        'property_id' => ($property ?? createProperty())->id,
+        'label' => ['en' => 'Cotton'],
+        ...$attributes,
+    ]);
+}
+
+/**
+ * Only fake the plugin event: Eloquent model events must keep running.
+ */
+function fakePropertyEvents(): void
+{
+    Event::fake([ProductPropertiesChanged::class]);
+}
+
+/**
+ * @return \Illuminate\Support\Collection<int, ProductPropertiesChanged>
+ */
+function propertyEvents(?ProductPropertiesChangeReason $reason = null)
+{
+    return Event::dispatched(ProductPropertiesChanged::class)
+        ->map(fn (array $args) => $args[0])
+        ->filter(fn (ProductPropertiesChanged $event) => $reason === null || $event->reason === $reason)
+        ->values();
+}
+
+/**
+ * Union of the product ids of every dispatched event, optionally filtered by reason.
+ *
+ * @return list<int>
+ */
+function propertyProductIds(?ProductPropertiesChangeReason $reason = null): array
+{
+    return ProductPropertiesChanged::normalizeIds(
+        propertyEvents($reason)->flatMap(fn (ProductPropertiesChanged $event) => $event->productIds)
+    );
 }

@@ -3,6 +3,8 @@
 namespace Gongarce\ProductProps\Models;
 
 use factories\PropertyValueFactory;
+use Gongarce\ProductProps\Events\ProductPropertiesChanged;
+use Gongarce\ProductProps\Events\ProductPropertiesChangeReason;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,7 +49,59 @@ class PropertyValue extends BaseModel implements Contracts\PropertyValue
         'label' => AsCollection::class,
     ];
 
-    protected static function booted() {}
+    /**
+     * Products associated to this value, captured before deletion because the
+     * pivot rows are removed by the database cascade. Not persisted.
+     *
+     * @var list<int>|null
+     */
+    protected ?array $productPropertiesDeletedProductIds = null;
+
+    protected static function booted()
+    {
+        static::updated(function (self $value) {
+            if (! $value->wasChanged(['label', 'property_id'])) {
+                return;
+            }
+
+            ProductPropertiesChanged::dispatch(
+                $value->affectedProductIds(),
+                ProductPropertiesChangeReason::ValueUpdated,
+                $value->property_id === null ? null : (int) $value->property_id,
+                $value->getKey(),
+            );
+        });
+
+        static::deleting(function (self $value) {
+            $value->productPropertiesDeletedProductIds = $value->affectedProductIds();
+        });
+
+        static::deleted(function (self $value) {
+            $productIds = $value->productPropertiesDeletedProductIds ?? [];
+            $value->productPropertiesDeletedProductIds = null;
+
+            ProductPropertiesChanged::dispatch(
+                $productIds,
+                ProductPropertiesChangeReason::ValueDeleted,
+                $value->property_id === null ? null : (int) $value->property_id,
+                $value->getKey(),
+            );
+        });
+    }
+
+    /**
+     * Return the ids of every product this value is associated to.
+     *
+     * @return list<int>
+     */
+    public function affectedProductIds(): array
+    {
+        if (! $this->getKey()) {
+            return [];
+        }
+
+        return ProductPropertyValue::productIdsForValues([$this->getKey()], $this->getConnectionName());
+    }
 
     /**
      * Return a new factory instance for the model.
@@ -62,7 +116,7 @@ class PropertyValue extends BaseModel implements Contracts\PropertyValue
      */
     public function property(): BelongsTo
     {
-        return $this->belongsTo(Property::class, 'property_id');
+        return $this->belongsTo(Property::modelClass(), 'property_id');
     }
 
     /**
@@ -70,7 +124,7 @@ class PropertyValue extends BaseModel implements Contracts\PropertyValue
      */
     public function products(): BelongsToMany
     {
-        $prefix = config('lunar.database.table_prefix');
-        return $this->belongsToMany(Product::class, "{$prefix}product_property_value");
+        return $this->belongsToMany(Product::modelClass(), ProductPropertyValue::tableName())
+            ->using(ProductPropertyValue::class);
     }
 }

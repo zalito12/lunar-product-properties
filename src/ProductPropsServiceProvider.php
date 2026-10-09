@@ -2,6 +2,7 @@
 
 namespace Gongarce\ProductProps;
 
+use Gongarce\ProductProps\Models\ProductPropertyValue;
 use Gongarce\ProductProps\Models\PropertyValue;
 use Illuminate\Support\ServiceProvider;
 use Lunar\Facades\ModelManifest;
@@ -29,8 +30,8 @@ class ProductPropsServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'product-props');
 
         Product::resolveRelationUsing('properties', function (Product $product) {
-            $prefix = config('lunar.database.table_prefix');
-            return $product->belongsToMany(PropertyValue::class, "{$prefix}product_property_value")
+            return $product->belongsToMany(PropertyValue::modelClass(), ProductPropertyValue::tableName())
+                ->using(ProductPropertyValue::class)
                 ->withPivot('position')->orderByPivot('position');
         });
 
