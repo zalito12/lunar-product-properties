@@ -27,6 +27,16 @@ function productPropsPage(Product $product)
 }
 
 describe('product properties page', function () {
+    it('only allows values to be detached from the product', function () {
+        $this->product->properties()->attach($this->value);
+
+        productPropsPage($this->product)
+            ->assertTableActionExists('detach', record: $this->value)
+            ->assertTableActionDoesNotExist('delete', record: $this->value)
+            ->assertTableBulkActionExists('detach')
+            ->assertTableBulkActionDoesNotExist('delete');
+    });
+
     it('creates a value attached to the product', function () {
         fakePropertyEvents();
 
@@ -98,33 +108,6 @@ describe('product properties page', function () {
 
         expect($this->value->refresh()->translate('label'))->toBe('Linen')
             ->and(propertyEvents(Reason::ValueUpdated)->sole()->productIds)->toBe([$this->product->id, $other->id]);
-    });
-
-    it('deletes a value', function () {
-        $other = Product::factory()->create();
-        $this->product->properties()->attach($this->value);
-        $other->properties()->attach($this->value);
-        fakePropertyEvents();
-
-        productPropsPage($this->product)
-            ->callTableAction('delete', $this->value)
-            ->assertHasNoTableActionErrors();
-
-        $this->assertModelMissing($this->value);
-        expect(propertyEvents(Reason::ValueDeleted)->sole()->productIds)->toBe([$this->product->id, $other->id]);
-    });
-
-    it('bulk deletes values', function () {
-        $second = createValue($this->property);
-        $this->product->properties()->attach([$this->value->id, $second->id]);
-        fakePropertyEvents();
-
-        productPropsPage($this->product)
-            ->callTableBulkAction('delete', [$this->value, $second])
-            ->assertHasNoTableActionErrors();
-
-        expect(propertyEvents(Reason::ValueDeleted))->toHaveCount(2)
-            ->and(propertyProductIds(Reason::ValueDeleted))->toBe([$this->product->id]);
     });
 
     it('reorders values', function () {
