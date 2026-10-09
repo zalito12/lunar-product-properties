@@ -5,6 +5,7 @@ namespace Gongarce\ProductProps\Filament\Resources;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Lunar\Admin\Support\Forms\Components\TranslatedText;
@@ -12,6 +13,7 @@ use Lunar\Admin\Support\Resources\BaseResource;
 use Gongarce\ProductProps\Filament\Resources\PropertyResource\Pages;
 use Gongarce\ProductProps\Filament\Resources\PropertyResource\RelationManagers\PropertyValuesRelationManager;
 use Gongarce\ProductProps\Models\Property;
+use Illuminate\Support\Collection;
 use Lunar\Admin\Support\Tables\Columns\TranslatedTextColumn;
 
 class PropertyResource extends BaseResource
@@ -85,13 +87,46 @@ class PropertyResource extends BaseResource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                static::preventDeletingWithValues(Tables\Actions\DeleteAction::make()),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(function (Tables\Actions\DeleteBulkAction $action, Collection $records) {
+                            if ($records->contains(fn (Property $property) => $property->hasValues())) {
+                                static::notifyPropertyHasValues();
+                                $action->cancel();
+                            }
+                        }),
                 ]),
             ]);
+    }
+
+    /**
+     * Stop the delete action with a clear message when the property still has values.
+     *
+     * @template TAction of \Filament\Actions\DeleteAction|\Filament\Tables\Actions\DeleteAction
+     *
+     * @param  TAction  $action
+     * @return TAction
+     */
+    public static function preventDeletingWithValues($action)
+    {
+        return $action->before(function ($action, Property $record) {
+            if ($record->hasValues()) {
+                static::notifyPropertyHasValues();
+                $action->cancel();
+            }
+        });
+    }
+
+    protected static function notifyPropertyHasValues(): void
+    {
+        Notification::make()
+            ->danger()
+            ->title(__('lunarpanel.product-props::property.notifications.has_values.title'))
+            ->body(__('lunarpanel.product-props::property.notifications.has_values.body'))
+            ->send();
     }
 
     public static function getTableColumns(): array

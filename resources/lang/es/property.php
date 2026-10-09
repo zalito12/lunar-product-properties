@@ -24,4 +24,10 @@ return [
             ],
         ],
     ],
+    'notifications' => [
+        'has_values' => [
+            'title' => 'Propiedad en uso',
+            'body' => 'Elimina sus valores antes de eliminar la propiedad.',
+        ],
+    ],
 ];
